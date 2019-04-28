@@ -89,11 +89,11 @@ def generator(sentence_list, next_word_list, batch_size):
             index = index + 1
         yield x, y
 
-def get_model(dropout=0.2):
+def get_model(dropout=0.4):
     print('Build model...')
     input_len = SEQUENCE_LEN - 1
     model = Sequential()
-    model.add((LSTM(200, input_shape=(SEQUENCE_LEN, len(words)))))
+    model.add((LSTM(400, input_shape=(SEQUENCE_LEN, len(words)))))
     if dropout > 0:
         model.add(Dropout(dropout))
     model.add(Dense(len(words)))

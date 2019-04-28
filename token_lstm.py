@@ -93,7 +93,7 @@ def get_model(dropout=0.4):
     print('Build model...')
     input_len = SEQUENCE_LEN - 1
     model = Sequential()
-    model.add((LSTM(400, input_shape=(SEQUENCE_LEN, len(words)))))
+    model.add((LSTM(50, input_shape=(SEQUENCE_LEN, len(words)))))
     if dropout > 0:
         model.add(Dropout(dropout))
     model.add(Dense(len(words)))
@@ -163,7 +163,7 @@ print_callback = LambdaCallback(on_epoch_end=on_epoch_end)
 early_stopping = EarlyStopping(monitor='val_acc', patience=5)
 callbacks_list = [checkpoint, print_callback, early_stopping]
 
-BATCH_SIZE = 50
+BATCH_SIZE = 100
 
 model.fit_generator(generator(sentences, next_words, BATCH_SIZE),
                     steps_per_epoch=int(len(sentences) / BATCH_SIZE) + 1,

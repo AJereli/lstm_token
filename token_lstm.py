@@ -16,6 +16,7 @@ def sample(preds, temperature=1.0):
     probas = np.random.multinomial(1, preds, 1)
     return np.argmax(probas)
 
+
 def shuffle_and_split_training_set(sentences_original, next_original, percentage_test=2):
     # shuffle at unison
     print('Shuffling sentences')
@@ -34,6 +35,7 @@ def shuffle_and_split_training_set(sentences_original, next_original, percentage
     print("Size of test set = %d" % len(y_test))
     return (x_train, y_train), (x_test, y_test)
 
+
 def print_vocabulary(words_file_path, words_set):
     words_file = codecs.open(words_file_path, 'w', encoding='utf8')
     for w in words_set:
@@ -44,8 +46,12 @@ def print_vocabulary(words_file_path, words_set):
     words_file.close()
 
 examples_file = open("examples.txt", "w")
+
+
 def on_epoch_end(epoch, logs):
     # Function invoked at end of each epoch. Prints generated text.
+    print(f"Epoch {epoch} end")
+    print(f"{logs}")
     examples_file.write('\n----- Generating text after Epoch: %d\n' % epoch)
 
     # Randomly pick a seed sequence
@@ -93,7 +99,7 @@ def get_model(dropout=0.2):
     print('Build model...')
     input_len = SEQUENCE_LEN - 1
     model = Sequential()
-    model.add((LSTM(200, input_shape=(SEQUENCE_LEN, len(words)))))
+    model.add((LSTM(256, input_shape=(SEQUENCE_LEN, len(words)))))
     if dropout > 0:
         model.add(Dropout(dropout))
     model.add(Dense(len(words)))
@@ -158,12 +164,12 @@ file_path = "LSTM_NYT-epoch{epoch:03d}-words%d-sequence%d-minfreq%d-" \
             "loss{loss:.4f}-acc{acc:.4f}-val_loss{val_loss:.4f}-val_acc{val_acc:.4f}" % \
             (len(words), SEQUENCE_LEN, MIN_WORD_FREQUENCY)
 
-checkpoint = ModelCheckpoint(file_path, monitor='val_acc', save_best_only=True)
+checkpoint = ModelCheckpoint(file_path, monitor='val_acc', save_best_only=False, verbose=1)
 print_callback = LambdaCallback(on_epoch_end=on_epoch_end)
-early_stopping = EarlyStopping(monitor='val_acc', patience=5)
+early_stopping = EarlyStopping(monitor='val_acc', patience=5, verbose=1)
 callbacks_list = [checkpoint, print_callback, early_stopping]
 
-BATCH_SIZE = 50
+BATCH_SIZE = 64
 
 model.fit_generator(generator(sentences, next_words, BATCH_SIZE),
                     steps_per_epoch=int(len(sentences) / BATCH_SIZE) + 1,
